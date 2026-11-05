@@ -8,7 +8,12 @@ insert into staging.stop_changes
   (stop_id, eva, changed_arr, changed_dep, changed_platform, is_cancelled, content_hash, fetched_at)
 values (%(stop_id)s, %(eva)s, %(changed_arr)s, %(changed_dep)s, %(changed_platform)s,
         %(is_cancelled)s, %(content_hash)s, %(fetched_at)s)
-on conflict (stop_id, content_hash) do nothing
+on conflict (stop_id, content_hash) do update
+  set fetched_at = excluded.fetched_at, loaded_at = now()
+  -- a state that comes back (delay 5 -> 10 -> 5) must become the latest again;
+  -- unchanged trains (already the latest state) are left alone, so no write per run
+  where stop_changes.fetched_at < (select max(s.fetched_at) from staging.stop_changes s
+                                   where s.stop_id = excluded.stop_id)
 """
 
 UPSERT_PLAN = """

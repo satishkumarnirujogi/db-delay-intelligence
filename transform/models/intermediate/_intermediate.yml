@@ -1,0 +1,53 @@
+version: 2
+
+models:
+  - name: int_stop_latest_change
+    columns:
+      - name: stop_id
+        data_tests: [unique, not_null]
+
+unit_tests:
+  - name: latest_change_before_departure_wins
+    description: >
+      The newest change fetched before departure wins (1); a change fetched long after
+      the train left is ignored (2).
+    model: int_stop_latest_change
+    given:
+      - input: ref('stg_db__plan_stops')
+        rows:
+          - {stop_id: A, planned_dep: "2026-11-05 13:00:00+00"}
+      - input: ref('stg_db__stop_changes')
+        rows:
+          - {stop_id: A, changed_dep: "2026-11-05 13:05:00+00", changed_platform: null, is_cancelled: false, fetched_at: "2026-11-05 12:00:00+00"}
+          - {stop_id: A, changed_dep: "2026-11-05 13:10:00+00", changed_platform: null, is_cancelled: false, fetched_at: "2026-11-05 12:30:00+00"}
+          - {stop_id: A, changed_dep: "2026-11-05 13:10:00+00", changed_platform: "9", is_cancelled: false, fetched_at: "2026-11-05 14:00:00+00"}
+    expect:
+      rows:
+        - {stop_id: A, changed_dep: "2026-11-05 13:10:00+00", changed_platform: null, fetched_at: "2026-11-05 12:30:00+00"}
+
+  - name: enriched_delay_and_punctuality_rules
+    description: >
+      (3) no change -> delay 0, no realtime; (4) cancelled -> not punctual;
+      (5) 5 min late = punctual, 6 min = not; (6) DST-end night delay and Berlin service date.
+    model: int_stop_enriched
+    given:
+      - input: ref('stg_db__plan_stops')
+        rows:
+          - {stop_id: no_change, planned_dep: "2026-11-05 13:00:00+00", planned_platform: "1"}
+          - {stop_id: cancelled, planned_dep: "2026-11-05 13:00:00+00", planned_platform: "1"}
+          - {stop_id: late_5, planned_dep: "2026-11-05 13:00:00+00", planned_platform: "1"}
+          - {stop_id: late_6, planned_dep: "2026-11-05 13:00:00+00", planned_platform: "1"}
+          - {stop_id: dst_night, planned_dep: "2026-10-25 00:30:00+00", planned_platform: "1"}
+      - input: ref('int_stop_latest_change')
+        rows:
+          - {stop_id: cancelled, changed_dep: "2026-11-05 13:02:00+00", changed_platform: "1", is_cancelled: true}
+          - {stop_id: late_5, changed_dep: "2026-11-05 13:05:00+00", changed_platform: "4", is_cancelled: false}
+          - {stop_id: late_6, changed_dep: "2026-11-05 13:06:00+00", changed_platform: null, is_cancelled: false}
+          - {stop_id: dst_night, changed_dep: "2026-10-25 01:35:00+00", changed_platform: null, is_cancelled: false}
+    expect:
+      rows:
+        - {stop_id: no_change, dep_delay_min: 0, has_realtime: false, is_cancelled: false, is_punctual: true, platform_changed: false, delay_band: "on time (<6)", service_date: "2026-11-05", service_hour: 14}
+        - {stop_id: cancelled, dep_delay_min: 2, has_realtime: true, is_cancelled: true, is_punctual: false, platform_changed: false, delay_band: cancelled, service_date: "2026-11-05", service_hour: 14}
+        - {stop_id: late_5, dep_delay_min: 5, has_realtime: true, is_cancelled: false, is_punctual: true, platform_changed: true, delay_band: "on time (<6)", service_date: "2026-11-05", service_hour: 14}
+        - {stop_id: late_6, dep_delay_min: 6, has_realtime: true, is_cancelled: false, is_punctual: false, platform_changed: false, delay_band: "6-15 min", service_date: "2026-11-05", service_hour: 14}
+        - {stop_id: dst_night, dep_delay_min: 65, has_realtime: true, is_cancelled: false, is_punctual: false, platform_changed: false, delay_band: "30+ min", service_date: "2026-10-25", service_hour: 2}

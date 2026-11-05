@@ -1,0 +1,37 @@
+name: daily
+
+on:
+  schedule:
+    - cron: "20 3 * * *"        # 03:20 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: pipeline               # shares the lock with pipeline.yml
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PG_HOST: ${{ secrets.PG_HOST }}
+      PG_PORT: ${{ secrets.PG_PORT }}
+      PG_DB: ${{ secrets.PG_DB }}
+      PG_USER: ${{ secrets.PG_USER }}
+      PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
+      DBT_PROFILES_DIR: ${{ github.workspace }}/transform
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      - name: dbt seed + daily models (dims, aggregates)
+        working-directory: transform
+        run: |
+          dbt seed --no-version-check
+          dbt build --selector daily --no-version-check
+
+      # Step 7 adds: Parquet export, retention deletes, raw-file cleanup, usage log

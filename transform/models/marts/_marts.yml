@@ -1,0 +1,165 @@
+version: 2
+
+models:
+  - name: fact_stop_event
+    description: One row per stop (train x station). Current best-known delay; grain = stop_id.
+    config:
+      contract: {enforced: true}
+    columns:
+      - name: stop_id
+        data_type: text
+        data_tests: [unique, not_null]
+      - name: eva
+        data_type: integer
+        data_tests:
+          - not_null
+          - relationships: {arguments: {to: ref('dim_station'), field: eva}}
+      - name: train_category
+        data_type: text
+        data_tests:
+          - relationships:
+              arguments: {to: ref('dim_train'), field: train_category}
+              config: {severity: warn}  # dim_train refreshes daily; new categories appear first here
+      - {name: train_number, data_type: text}
+      - {name: line, data_type: text}
+      - {name: planned_platform, data_type: text}
+      - {name: planned_arr, data_type: timestamp with time zone}
+      - {name: planned_dep, data_type: timestamp with time zone}
+      - {name: actual_arr, data_type: timestamp with time zone}
+      - {name: actual_dep, data_type: timestamp with time zone}
+      - name: planned_event_at
+        data_type: timestamp with time zone
+        data_tests: [not_null]
+      - name: service_date
+        data_type: date
+        data_tests: [not_null]
+      - {name: service_hour, data_type: integer}
+      - name: dep_delay_min
+        data_type: integer
+        data_tests: [delay_in_range]
+      - name: arr_delay_min
+        data_type: integer
+        data_tests: [delay_in_range]
+      - {name: has_realtime, data_type: boolean}
+      - {name: is_cancelled, data_type: boolean}
+      - {name: is_punctual, data_type: boolean}
+      - {name: platform_changed, data_type: boolean}
+      - name: delay_band
+        data_type: text
+        data_tests:
+          - accepted_values:
+              arguments: {values: ['cancelled', 'on time (<6)', '6-15 min', '16-30 min', '30+ min']}
+      - {name: loaded_at, data_type: timestamp with time zone}
+
+  - name: v_today_stop_event
+    description: Today's stops (Berlin date) with station name. Power BI DirectQuery source.
+    config:
+      contract: {enforced: true}
+    columns:
+      - {name: stop_id, data_type: text}
+      - {name: eva, data_type: integer}
+      - {name: train_category, data_type: text}
+      - {name: train_number, data_type: text}
+      - {name: line, data_type: text}
+      - {name: planned_platform, data_type: text}
+      - {name: planned_arr, data_type: timestamp with time zone}
+      - {name: planned_dep, data_type: timestamp with time zone}
+      - {name: actual_arr, data_type: timestamp with time zone}
+      - {name: actual_dep, data_type: timestamp with time zone}
+      - {name: planned_event_at, data_type: timestamp with time zone}
+      - {name: service_date, data_type: date}
+      - {name: service_hour, data_type: integer}
+      - {name: dep_delay_min, data_type: integer}
+      - {name: arr_delay_min, data_type: integer}
+      - {name: has_realtime, data_type: boolean}
+      - {name: is_cancelled, data_type: boolean}
+      - {name: is_punctual, data_type: boolean}
+      - {name: platform_changed, data_type: boolean}
+      - {name: delay_band, data_type: text}
+      - {name: loaded_at, data_type: timestamp with time zone}
+      - {name: station_name, data_type: text}
+
+  - name: agg_station_hour
+    description: Departures per Berlin service date x hour x station x category. Kept long-term.
+    config:
+      contract: {enforced: true}
+    data_tests:
+      - unique_combination:
+          arguments: {columns: [service_date, service_hour, eva, train_category]}
+    columns:
+      - {name: service_date, data_type: date}
+      - {name: service_hour, data_type: integer}
+      - {name: eva, data_type: integer}
+      - {name: train_category, data_type: text}
+      - {name: departures, data_type: integer}
+      - {name: departures_not_cancelled, data_type: integer}
+      - {name: punctual_departures, data_type: integer}
+      - {name: cancellations, data_type: integer}
+      - {name: platform_changes, data_type: integer}
+      - {name: avg_dep_delay_min, data_type: "numeric(8,2)"}
+
+  - name: fact_weather_hourly
+    columns:
+      - name: eva
+        data_tests:
+          - relationships: {arguments: {to: ref('dim_station'), field: eva}}
+
+  - name: dim_station
+    config:
+      contract: {enforced: true}
+    columns:
+      - name: eva
+        data_type: integer
+        data_tests: [unique, not_null]
+      - {name: station_name, data_type: text}
+      - {name: lat, data_type: "numeric(9,6)"}
+      - {name: lon, data_type: "numeric(9,6)"}
+      - {name: is_berlin, data_type: boolean}
+
+  - name: dim_train
+    config:
+      contract: {enforced: true}
+    columns:
+      - name: train_category
+        data_type: text
+        data_tests: [unique, not_null]
+      - {name: train_group, data_type: text}
+
+  - name: dim_date
+    config:
+      contract: {enforced: true}
+    columns:
+      - name: date_day
+        data_type: date
+        data_tests: [unique, not_null]
+      - {name: iso_weekday, data_type: integer}
+      - {name: weekday_name, data_type: text}
+      - {name: is_weekend, data_type: boolean}
+      - {name: month_num, data_type: integer}
+      - {name: year_month, data_type: text}
+      - {name: iso_year_week, data_type: integer}
+
+  - name: dim_hour
+    config:
+      contract: {enforced: true}
+    columns:
+      - name: service_hour
+        data_type: integer
+        data_tests: [unique, not_null]
+      - {name: hour_label, data_type: text}
+      - {name: day_part, data_type: text}
+
+exposures:
+  - name: powerbi_delay_dashboard
+    label: DB Delay Intelligence (Power BI)
+    type: dashboard
+    maturity: medium
+    owner:
+      name: Satish Kumar Nirujogi
+    depends_on:
+      - ref('v_today_stop_event')
+      - ref('agg_station_hour')
+      - ref('dim_station')
+      - ref('dim_train')
+      - ref('dim_date')
+      - ref('dim_hour')
