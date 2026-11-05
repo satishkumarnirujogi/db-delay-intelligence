@@ -20,3 +20,9 @@ sources:
           freshness:
             warn_after: {count: 90, period: minute}
             error_after: {count: 180, period: minute}
+
+  - name: ops
+    schema: ops
+    tables:
+      - name: ingestion_runs
+      - name: platform_usage

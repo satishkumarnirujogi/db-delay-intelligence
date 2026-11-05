@@ -11,7 +11,7 @@
 | 6a | Feature log: `ml_features_upcoming` view + `ml.feature_log` + `ml/score.py` | ✅ logging since 2026-11-05 |
 | 6b | Train (LightGBM vs baseline), predictions, anomalies, `train.yml` | ⏳ from ~2026-11-22, once 2–3 weeks of logs exist |
 | 7 | `ml/housekeeping.py` (Parquet export, retention, raw cleanup, `ops.platform_usage`) in `daily.yml`; `ci.yml` | ✅ housekeeping verified live; CI verified on first GitHub run |
-| 8 | Power BI | ⏳ |
+| 8 | Power BI: `v_today_stop_event` local-time + `is_departed` columns, `v_pipeline_runs`, `v_pipeline_status`; build guide `powerbi/README.md` (pages 1, 2, 7) | 🟡 data side done; dashboard to build in Desktop |
 | 9 | README polish | ⏳ |
 
 ## Decisions made while building

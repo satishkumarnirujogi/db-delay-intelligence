@@ -78,6 +78,38 @@ models:
       - {name: delay_band, data_type: text}
       - {name: loaded_at, data_type: timestamp with time zone}
       - {name: station_name, data_type: text}
+      - {name: planned_dep_local, data_type: timestamp without time zone}
+      - {name: actual_dep_local, data_type: timestamp without time zone}
+      - {name: planned_event_local, data_type: timestamp without time zone}
+      - {name: is_departed, data_type: boolean}
+
+  - name: v_pipeline_runs
+    description: Last 7 days of pipeline jobs (Power BI Pipeline health page, DirectQuery).
+    config:
+      contract: {enforced: true}
+    columns:
+      - {name: run_id, data_type: text}
+      - {name: job, data_type: text}
+      - {name: status, data_type: text}
+      - {name: started_local, data_type: timestamp without time zone}
+      - {name: duration_s, data_type: integer}
+      - {name: api_calls, data_type: integer}
+      - {name: rows_inserted, data_type: integer}
+      - {name: error, data_type: text}
+
+  - name: v_pipeline_status
+    description: One live row of pipeline-health KPIs (minutes since last load, failures, usage).
+    config:
+      contract: {enforced: true}
+    columns:
+      - {name: minutes_since_changes, data_type: integer}
+      - {name: minutes_since_plan, data_type: integer}
+      - {name: minutes_since_score, data_type: integer}
+      - {name: failed_runs_24h, data_type: integer}
+      - {name: db_mb, data_type: "numeric(10,1)"}
+      - {name: storage_mb, data_type: "numeric(10,1)"}
+      - {name: db_limit_mb, data_type: integer}
+      - {name: storage_limit_mb, data_type: integer}
 
   - name: agg_station_hour
     description: Departures per Berlin service date x hour x station x category. Kept long-term.
@@ -163,3 +195,5 @@ exposures:
       - ref('dim_train')
       - ref('dim_date')
       - ref('dim_hour')
+      - ref('v_pipeline_runs')
+      - ref('v_pipeline_status')
