@@ -9,5 +9,5 @@ db_delay:
       password: "{{ env_var('PG_PASSWORD') }}"
       dbname: "{{ env_var('PG_DB') }}"
       schema: intermediate
-      sslmode: require
+      sslmode: "{{ env_var('PG_SSLMODE', 'require') }}"
       threads: 4

@@ -1,4 +1,6 @@
 """Idempotent inserts into staging.* and run logging into ops.ingestion_runs."""
+import os
+
 import psycopg
 
 from ingestion.settings import env
@@ -48,7 +50,8 @@ def connect() -> psycopg.Connection:
     return psycopg.connect(
         host=env("PG_HOST"), port=env("PG_PORT"), dbname=env("PG_DB"),
         user=env("PG_USER"), password=env("PG_PASSWORD"),
-        sslmode="require", connect_timeout=20,
+        sslmode=os.getenv("PG_SSLMODE", "require"),  # CI's local Postgres container has no SSL
+        connect_timeout=20,
         autocommit=True,  # each conn.transaction() commits on its own, so a failed run is still logged
         prepare_threshold=None,  # the Supabase pooler may not keep prepared statements
     )

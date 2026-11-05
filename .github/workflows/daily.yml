@@ -6,7 +6,9 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: pipeline               # shares the lock with pipeline.yml
+  # own group: in the shared "pipeline" group a queued daily run would be cancelled by the
+  # next 10-min trigger (GitHub keeps one pending run per group)
+  group: daily
   cancel-in-progress: false
 
 jobs:
@@ -19,6 +21,8 @@ jobs:
       PG_DB: ${{ secrets.PG_DB }}
       PG_USER: ${{ secrets.PG_USER }}
       PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
       DBT_PROFILES_DIR: ${{ github.workspace }}/transform
     steps:
       - uses: actions/checkout@v4
@@ -34,4 +38,5 @@ jobs:
           dbt seed --no-version-check
           dbt build --selector daily --no-version-check
 
-      # Step 7 adds: Parquet export, retention deletes, raw-file cleanup, usage log
+      - name: Export Parquet, trim old rows and raw files, log usage
+        run: python -m ml.housekeeping

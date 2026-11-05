@@ -5,3 +5,4 @@ python-dotenv>=1.0
 pytest>=8.0
 dbt-core>=1.12,<2
 dbt-postgres>=1.11,<2
+pyarrow>=17
