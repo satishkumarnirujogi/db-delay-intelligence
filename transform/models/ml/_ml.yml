@@ -1,0 +1,8 @@
+version: 2
+
+models:
+  - name: ml_features_upcoming
+    description: Point-in-time features for departures in the next 2 hours (read by ml/score.py).
+    columns:
+      - name: stop_id
+        data_tests: [unique, not_null]
