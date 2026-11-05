@@ -45,4 +45,7 @@ jobs:
           dbt source freshness --no-version-check
           dbt build --selector live --no-version-check
 
-      # Step 6 adds: ml.score + ml.anomalies
+      - name: Log ML features (self-gated, every ~30 min)
+        run: python -m ml.score
+
+      # ml.anomalies is added once 3 weeks of history exist

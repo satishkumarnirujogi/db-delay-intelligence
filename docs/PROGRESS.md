@@ -8,7 +8,8 @@
 | 3 | Ingestion: `db_client`, `meteo_client`, `parser`, `storage`, `loader`, `run` + 8 tests | ✅ verified live |
 | 4 | `pipeline.yml` + cron-job.org trigger | ✅ running every 10 min |
 | 5 | dbt: staging → intermediate → marts, 2 unit tests, 22 data tests, contracts, exposure; `daily.yml` | ✅ green locally (39/39) |
-| 6 | ML | ⏳ next: feature log first (needs 2–3 weeks of data before training) |
+| 6a | Feature log: `ml_features_upcoming` view + `ml.feature_log` + `ml/score.py` | ✅ logging since 2026-11-05 |
+| 6b | Train (LightGBM vs baseline), predictions, anomalies, `train.yml` | ⏳ from ~2026-11-22, once 2–3 weeks of logs exist |
 | 7 | Housekeeping + CI | ⏳ |
 | 8 | Power BI | ⏳ |
 | 9 | README polish | ⏳ |
