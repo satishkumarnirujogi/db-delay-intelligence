@@ -1,0 +1,16 @@
+eva,station_name,lat,lon,is_berlin
+8098160,Berlin Hbf,52.5251,13.3694,True
+8011113,Berlin Südkreuz,52.4752,13.3655,True
+8010255,Berlin Ostbahnhof,52.5103,13.4348,True
+8011102,Berlin Gesundbrunnen,52.5486,13.3885,True
+8010404,Berlin-Spandau,52.5344,13.1975,True
+8002549,Hamburg Hbf,53.553,10.0067,False
+8000152,Hannover Hbf,52.3767,9.741,False
+8010205,Leipzig Hbf,51.3455,12.3821,False
+8000105,Frankfurt(Main)Hbf,50.1071,8.6638,False
+8000207,Köln Hbf,50.943,6.9589,False
+8000085,Düsseldorf Hbf,51.2199,6.7942,False
+8000261,München Hbf,48.1402,11.56,False
+8000284,Nürnberg Hbf,49.4458,11.0823,False
+8000096,Stuttgart Hbf,48.7843,9.1817,False
+8010085,Dresden Hbf,51.0405,13.732,False

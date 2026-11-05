@@ -1,0 +1,41 @@
+name: pipeline
+
+on:
+  workflow_dispatch:            # main trigger: cron-job.org calls this every 10 min
+  schedule:
+    - cron: "7,37 * * * *"      # fallback only, in case the external trigger fails
+
+concurrency:
+  group: pipeline
+  cancel-in-progress: false     # never run two pipelines at the same time
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      DB_CLIENT_ID: ${{ secrets.DB_CLIENT_ID }}
+      DB_API_KEY: ${{ secrets.DB_API_KEY }}
+      DB_BASE_URL: ${{ secrets.DB_BASE_URL }}
+      PG_HOST: ${{ secrets.PG_HOST }}
+      PG_PORT: ${{ secrets.PG_PORT }}
+      PG_DB: ${{ secrets.PG_DB }}
+      PG_USER: ${{ secrets.PG_USER }}
+      PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      - name: Ingest changes (every run)
+        run: python -m ingestion.run changes
+
+      - name: Ingest plan + weather (if due)
+        run: python -m ingestion.run hourly
+
+      # Step 5 adds: dbt build --selector live · Step 6 adds: ml.score + ml.anomalies
