@@ -24,6 +24,7 @@ jobs:
       PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+      DBT_PROFILES_DIR: ${{ github.workspace }}/transform
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -38,4 +39,10 @@ jobs:
       - name: Ingest plan + weather (if due)
         run: python -m ingestion.run hourly
 
-      # Step 5 adds: dbt build --selector live · Step 6 adds: ml.score + ml.anomalies
+      - name: dbt build (live models)
+        working-directory: transform
+        run: |
+          dbt source freshness --no-version-check
+          dbt build --selector live --no-version-check
+
+      # Step 6 adds: ml.score + ml.anomalies

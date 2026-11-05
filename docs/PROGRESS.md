@@ -6,9 +6,9 @@
 | 1 | `ingestion/explore.py` → stations seed, fixtures, `docs/api_notes.md` | ✅ |
 | 2 | `sql/010_setup.sql`, `sql/020_powerbi_reader.sql`, buckets `bronze` + `ml` | ✅ verified live |
 | 3 | Ingestion: `db_client`, `meteo_client`, `parser`, `storage`, `loader`, `run` + 8 tests | ✅ verified live |
-| 4 | `pipeline.yml` + cron-job.org trigger | 🟡 workflow written; push, secrets, cron-job.org pending |
-| 5 | dbt | ⏳ next |
-| 6 | ML | ⏳ needs 2–3 weeks of data |
+| 4 | `pipeline.yml` + cron-job.org trigger | ✅ running every 10 min |
+| 5 | dbt: staging → intermediate → marts, 2 unit tests, 22 data tests, contracts, exposure; `daily.yml` | ✅ green locally (39/39) |
+| 6 | ML | ⏳ next: feature log first (needs 2–3 weeks of data before training) |
 | 7 | Housekeeping + CI | ⏳ |
 | 8 | Power BI | ⏳ |
 | 9 | README polish | ⏳ |
@@ -24,6 +24,16 @@
 - Message-only `<s>` entries in `fchg` (no `<ar>`/`<dp>`) are skipped.
 - Weather: last 6 h + next 3 h per hourly run, upserted (observations replace earlier forecasts).
 - Station coordinates are approximate (hand-entered); only used for the weather grid cell.
+- **Change dedupe fix:** the guide's `on conflict do nothing` loses reverts (delay 5 → 10 → 5 would
+  stay at 10). The insert now refreshes `fetched_at` of a returning state, only when it is not
+  already the latest for that stop (no write for unchanged trains). Tested in `test_loader_live.py`.
+- dbt: no `dbt_utils` package (two small generic tests in `transform/tests/generic/` instead),
+  so no `dbt deps` network call every 10 min. Replacement buses (`Bus`) are filtered in staging.
+- `dim_train` groups categories into Long distance / Regional / S-Bahn.
+- `agg_station_hour` is incremental (last 3 service dates rebuilt daily) so history survives the
+  90-day trim of `fact_stop_event`.
+- **Watch DB size:** ~14k stops/day → ~1.2M fact rows at 90 days. If Supabase nears 500 MB,
+  shorten fact detail to 30–45 days (history stays in `agg_station_hour` + Parquet).
 
 ## First live run (2026-11-05)
 

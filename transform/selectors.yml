@@ -1,0 +1,11 @@
+selectors:
+  - name: live
+    description: Every 10 min - staging/intermediate views and the incremental fact.
+    definition:
+      method: tag
+      value: live
+  - name: daily
+    description: Once a day - aggregates and dimensions.
+    definition:
+      method: tag
+      value: daily

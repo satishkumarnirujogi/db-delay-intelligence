@@ -10,3 +10,4 @@ logs/
 *.pbix
 powerbi/**/.pbi/localSettings.json
 powerbi/**/.pbi/cache.abf
+transform/.user.yml

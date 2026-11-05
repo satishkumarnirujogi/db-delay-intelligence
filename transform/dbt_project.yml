@@ -1,0 +1,33 @@
+name: db_delay
+version: "1.0.0"
+profile: db_delay
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+
+models:
+  db_delay:
+    staging:
+      +materialized: view
+      +schema: intermediate
+      +tags: ["live"]
+    intermediate:
+      +materialized: view
+      +schema: intermediate
+      +tags: ["live"]
+    marts:
+      +materialized: table
+      +schema: marts
+
+seeds:
+  db_delay:
+    +schema: intermediate
+    stations:
+      +column_types:
+        eva: int
+        station_name: text
+        lat: numeric(9,6)
+        lon: numeric(9,6)
+        is_berlin: boolean

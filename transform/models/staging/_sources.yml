@@ -1,0 +1,22 @@
+version: 2
+
+sources:
+  - name: db_raw
+    schema: staging
+    config:
+      loaded_at_field: loaded_at
+      freshness:
+        warn_after: {count: 20, period: minute}
+        error_after: {count: 60, period: minute}
+    tables:
+      - name: plan_stops
+        config:
+          freshness:  # loaded hourly
+            warn_after: {count: 90, period: minute}
+            error_after: {count: 180, period: minute}
+      - name: stop_changes
+      - name: weather_hourly
+        config:
+          freshness:
+            warn_after: {count: 90, period: minute}
+            error_after: {count: 180, period: minute}
