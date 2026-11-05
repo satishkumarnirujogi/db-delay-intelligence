@@ -1,0 +1,52 @@
+name: ci
+
+# Lint, tests and a full dbt build against a throwaway Postgres - never touches Supabase.
+on:
+  pull_request:
+  push:
+    branches: [main]
+    paths-ignore: ["docs/**", "**.md"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PG_HOST: localhost
+      PG_PORT: "5432"
+      PG_DB: postgres
+      PG_USER: postgres
+      PG_PASSWORD: postgres
+      PG_SSLMODE: disable
+      PGPASSWORD: postgres
+      DBT_PROFILES_DIR: ${{ github.workspace }}/transform
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: pip install -r requirements.txt ruff
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Create schemas and tables
+        run: for f in sql/*.sql; do psql -h localhost -U postgres -d postgres -v ON_ERROR_STOP=1 -q -f "$f"; done
+
+      - name: dbt build (seeds, models, unit + data tests, contracts)
+        working-directory: transform
+        run: |
+          dbt seed --no-version-check
+          dbt build --no-version-check
+
+      - name: pytest (parser + live loader/housekeeping tests on the CI database)
+        run: pytest -q

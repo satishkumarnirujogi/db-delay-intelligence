@@ -1,11 +1,10 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from ingestion.parser import content_hash, parse_changes, parse_db_time, parse_plan, parse_weather
 
 FIX = Path(__file__).parent / "fixtures"
-NOW = datetime(2026, 11, 5, 12, 44, tzinfo=timezone.utc)
-UTC = timezone.utc
+NOW = datetime(2026, 11, 5, 12, 44, tzinfo=UTC)
 
 
 def test_parse_db_time_winter():

@@ -10,7 +10,7 @@
 | 5 | dbt: staging → intermediate → marts, 2 unit tests, 22 data tests, contracts, exposure; `daily.yml` | ✅ green locally (39/39) |
 | 6a | Feature log: `ml_features_upcoming` view + `ml.feature_log` + `ml/score.py` | ✅ logging since 2026-11-05 |
 | 6b | Train (LightGBM vs baseline), predictions, anomalies, `train.yml` | ⏳ from ~2026-11-22, once 2–3 weeks of logs exist |
-| 7 | Housekeeping + CI | ⏳ |
+| 7 | `ml/housekeeping.py` (Parquet export, retention, raw cleanup, `ops.platform_usage`) in `daily.yml`; `ci.yml` | ✅ housekeeping verified live; CI verified on first GitHub run |
 | 8 | Power BI | ⏳ |
 | 9 | README polish | ⏳ |
 
@@ -32,9 +32,17 @@
   so no `dbt deps` network call every 10 min. Replacement buses (`Bus`) are filtered in staging.
 - `dim_train` groups categories into Long distance / Regional / S-Bahn.
 - `agg_station_hour` is incremental (last 3 service dates rebuilt daily) so history survives the
-  90-day trim of `fact_stop_event`.
-- **Watch DB size:** ~14k stops/day → ~1.2M fact rows at 90 days. If Supabase nears 500 MB,
-  shorten fact detail to 30–45 days (history stays in `agg_station_hour` + Parquet).
+  trim of `fact_stop_event`.
+- **Retention (from first-day measurements):** stop_changes ~15 MB/day, fact ~4 MB/day, raw fchg
+  files ~70 MB/day. The guide's 7-day staging + 90-day fact would pass 500 MB, so: staging 3 days,
+  fact detail 30 days, feature_log 60 days, raw files 3 days, weather 7 days. Fact/feature rows
+  are deleted only for days whose Parquet export exists (`history/<table>/service_date=…/`).
+  Expected steady state: database ~250–300 MB, storage ~250 MB + ~165 MB/year Parquet.
+- **Never `--full-refresh` `fact_stop_event`:** staging only holds 3 days, so a rebuild would drop
+  older detail (it is still in Parquet).
+- `daily.yml` has its own concurrency group: in the shared group a queued daily run would be
+  cancelled by the next 10-min trigger.
+- CI runs on PRs and pushes to `main` against a throwaway Postgres 17 (`PG_SSLMODE=disable`).
 
 ## First live run (2026-11-05)
 
