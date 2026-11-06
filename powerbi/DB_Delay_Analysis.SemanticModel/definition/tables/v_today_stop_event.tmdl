@@ -1,0 +1,343 @@
+table v_today_stop_event
+	lineageTag: f5e0f765-af39-41bd-9505-ed8225429a52
+
+	column stop_id
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: c8413472-13f1-46fb-aabb-54b6f78ca6bb
+		summarizeBy: none
+		sourceColumn: stop_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column eva
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 6f2fa6c4-1b0f-4a0b-92c6-810115b1b166
+		summarizeBy: none
+		sourceColumn: eva
+
+		annotation SummarizationSetBy = Automatic
+
+	column train_category
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: a2208f1f-ddf6-4e3b-b53e-0ab5148d945a
+		summarizeBy: none
+		sourceColumn: train_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column train_number
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 3fc2ed20-d1fc-4fa9-96c6-1ebf7443d629
+		summarizeBy: none
+		sourceColumn: train_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column line
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: c7752518-87f1-4657-b78a-72c9cc49efc3
+		summarizeBy: none
+		sourceColumn: line
+
+		annotation SummarizationSetBy = Automatic
+
+	column planned_platform
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 56b4b93e-bf9d-4faa-9467-cdb5f0cd2eb8
+		summarizeBy: none
+		sourceColumn: planned_platform
+
+		annotation SummarizationSetBy = Automatic
+
+	column planned_arr
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: datetime2
+		lineageTag: b1956227-7e6f-4f67-bc77-2902017d80f3
+		summarizeBy: none
+		sourceColumn: planned_arr
+
+		annotation SummarizationSetBy = Automatic
+
+	column planned_dep
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: datetime2
+		lineageTag: 46e7ecd3-12d8-4716-8a71-d150bf382475
+		summarizeBy: none
+		sourceColumn: planned_dep
+
+		annotation SummarizationSetBy = Automatic
+
+	column actual_arr
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: datetime2
+		lineageTag: 1161d715-de88-4371-98bc-6c11f1fee9b8
+		summarizeBy: none
+		sourceColumn: actual_arr
+
+		annotation SummarizationSetBy = Automatic
+
+	column actual_dep
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: datetime2
+		lineageTag: a67d818c-06f2-42d3-9b78-e71550b438bb
+		summarizeBy: none
+		sourceColumn: actual_dep
+
+		annotation SummarizationSetBy = Automatic
+
+	column planned_event_at
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: datetime2
+		lineageTag: 1cb5a6b1-b652-4a47-aa91-2389249304f5
+		summarizeBy: none
+		sourceColumn: planned_event_at
+
+		annotation SummarizationSetBy = Automatic
+
+	column service_date
+		dataType: dateTime
+		formatString: Long Date
+		sourceProviderType: date
+		lineageTag: 3f074ac8-a00a-4924-ae48-8973abcbf19d
+		summarizeBy: none
+		sourceColumn: service_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column service_hour
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: cd80a9c6-ebc5-451c-a625-20fcbae458de
+		summarizeBy: none
+		sourceColumn: service_hour
+
+		annotation SummarizationSetBy = Automatic
+
+	column dep_delay_min
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: a706be6a-b0d0-4e0f-9c59-e152688dd0b2
+		summarizeBy: none
+		sourceColumn: dep_delay_min
+
+		annotation SummarizationSetBy = Automatic
+
+	column arr_delay_min
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: f15fb710-e2aa-49b7-bf76-9f879f62c4fa
+		summarizeBy: sum
+		sourceColumn: arr_delay_min
+
+		annotation SummarizationSetBy = Automatic
+
+	column has_realtime
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: bfc86096-7d1d-4fe7-bacf-cc7402b6c5b4
+		summarizeBy: none
+		sourceColumn: has_realtime
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_cancelled
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: 826df67f-dc20-4722-abe4-8744173771de
+		summarizeBy: none
+		sourceColumn: is_cancelled
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_punctual
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: 17a93a62-0c1c-4f1a-a764-581ff82dbf2a
+		summarizeBy: none
+		sourceColumn: is_punctual
+
+		annotation SummarizationSetBy = Automatic
+
+	column platform_changed
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: b7f7dbe7-40d9-4b16-888f-07468b1a3a73
+		summarizeBy: none
+		sourceColumn: platform_changed
+
+		annotation SummarizationSetBy = Automatic
+
+	column delay_band
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: e1213b06-e246-45cc-ab8b-86aa823c8edd
+		summarizeBy: none
+		sourceColumn: delay_band
+
+		annotation SummarizationSetBy = Automatic
+
+	column loaded_at
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: datetime2
+		lineageTag: b6d9bfba-3cf2-414b-a9aa-85998ce82790
+		summarizeBy: none
+		sourceColumn: loaded_at
+
+		annotation SummarizationSetBy = Automatic
+
+	column station_name
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: bbdb5bee-b137-4a0b-aad4-2c8963a7fa3d
+		summarizeBy: none
+		sourceColumn: station_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column planned_dep_local
+		dataType: dateTime
+		formatString: HH:mm
+		sourceProviderType: datetime2
+		lineageTag: b509e11f-a3ae-4562-9249-fbf7456e6bef
+		summarizeBy: none
+		sourceColumn: planned_dep_local
+
+		annotation SummarizationSetBy = Automatic
+
+	column actual_dep_local
+		dataType: dateTime
+		formatString: HH:mm
+		sourceProviderType: datetime2
+		lineageTag: b714eea7-a96f-45f3-9023-c93712023034
+		summarizeBy: none
+		sourceColumn: actual_dep_local
+
+		annotation SummarizationSetBy = Automatic
+
+	column planned_event_local
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: datetime2
+		lineageTag: 31528711-53ed-40d3-9527-146e9f7f0d51
+		summarizeBy: none
+		sourceColumn: planned_event_local
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_departed
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: 980fe101-cbd8-43dd-a236-f1ce5218c937
+		summarizeBy: none
+		sourceColumn: is_departed
+
+		annotation SummarizationSetBy = Automatic
+
+	column f_departed
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: bab5ba68-e04c-4452-b5ee-2d2ea5d32e12
+		summarizeBy: none
+		sourceColumn: f_departed
+
+	column f_departed_not_cancelled
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 45f4aedc-023d-4a3e-bdfd-69edef7a11be
+		summarizeBy: none
+		sourceColumn: f_departed_not_cancelled
+
+	column f_on_time
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: f32c07cc-c4d5-4041-893d-ecbfadd3018d
+		summarizeBy: none
+		sourceColumn: f_on_time
+
+	column f_cancelled
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: a55baeab-1623-475b-a29e-781bffb4479e
+		summarizeBy: none
+		sourceColumn: f_cancelled
+
+	column f_live
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 5350fdc1-72f0-480a-84a9-96d2fd872239
+		summarizeBy: none
+		sourceColumn: f_live
+
+	column f_platform_changed
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 8118a201-6528-44ef-afbf-057da89c8438
+		summarizeBy: none
+		sourceColumn: f_platform_changed
+
+	column f_delay_value
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: c4a8a113-9440-4531-89c0-b10a0620b854
+		summarizeBy: none
+		sourceColumn: f_delay_value
+
+	column f_delay_count
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: c6d21119-72de-4569-8d15-687a036815b9
+		summarizeBy: none
+		sourceColumn: f_delay_count
+
+	partition v_today_stop_event = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database("aws-1-eu-central-1.pooler.supabase.com:5432", "postgres"),
+				    marts_v_today_stop_event = Source{[Schema="marts",Item="v_today_stop_event"]}[Data],
+				    f1 = Table.AddColumn(marts_v_today_stop_event, "f_departed", each if [is_departed] = true then 1 else 0, Int64.Type),
+				    f2 = Table.AddColumn(f1, "f_departed_not_cancelled", each if [is_departed] = true and [is_cancelled] = false then 1 else 0, Int64.Type),
+				    f3 = Table.AddColumn(f2, "f_on_time", each if [is_departed] = true and [is_punctual] = true then 1 else 0, Int64.Type),
+				    f4 = Table.AddColumn(f3, "f_cancelled", each if [is_departed] = true and [is_cancelled] = true then 1 else 0, Int64.Type),
+				    f5 = Table.AddColumn(f4, "f_live", each if [is_departed] = true and [has_realtime] = true then 1 else 0, Int64.Type),
+				    f6 = Table.AddColumn(f5, "f_platform_changed", each if [platform_changed] = true then 1 else 0, Int64.Type),
+				    f7 = Table.AddColumn(f6, "f_delay_value", each if [is_departed] = true and [is_cancelled] = false then [dep_delay_min] else null, Int64.Type),
+				    f8 = Table.AddColumn(f7, "f_delay_count", each if [is_departed] = true and [is_cancelled] = false and [dep_delay_min] <> null then 1 else 0, Int64.Type)
+				in
+				    f8
+
+	changedProperty = Name
+
+	annotation PBI_ResultType = Table
+

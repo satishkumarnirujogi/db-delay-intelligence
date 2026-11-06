@@ -1,0 +1,28 @@
+model Model
+	culture: en-IN
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	dataSourceDefaultMaxConnections: 8
+	sourceQueryCulture: en-IN
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["v_today_stop_event","agg_station_hour","dim_station","dim_train","dim_date","dim_hour","v_pipeline_status","v_pipeline_runs","_Measures"]
+
+annotation PBI_ProTooling = ["MCP-PBIModeling","DevMode"]
+
+ref table v_today_stop_event
+ref table agg_station_hour
+ref table dim_station
+ref table dim_train
+ref table dim_date
+ref table dim_hour
+ref table v_pipeline_status
+ref table v_pipeline_runs
+ref table _Measures
+
+ref cultureInfo en-IN
+

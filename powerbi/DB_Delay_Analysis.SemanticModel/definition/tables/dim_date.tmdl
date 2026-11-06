@@ -1,0 +1,88 @@
+table dim_date
+	lineageTag: c5f7ae63-7b66-43cd-8ce0-db04863ec8dc
+	dataCategory: Time
+
+	column date_day
+		dataType: dateTime
+		isKey
+		formatString: Long Date
+		sourceProviderType: date
+		lineageTag: acb04e5c-a8db-42a6-841f-1c3068eaa372
+		summarizeBy: none
+		sourceColumn: date_day
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column iso_weekday
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 9f225003-b5ae-40e0-809a-5252adeb0dd4
+		summarizeBy: none
+		sourceColumn: iso_weekday
+
+		annotation SummarizationSetBy = Automatic
+
+	column weekday_name
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 54716e2d-7960-4e23-8a9d-b2fc5bf6d39a
+		summarizeBy: none
+		sourceColumn: weekday_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_weekend
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: aabbc5ca-95d4-4eb2-ac02-2e3b8f05b374
+		summarizeBy: none
+		sourceColumn: is_weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	column month_num
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 255709ab-994f-4ee3-a241-2514e86d455e
+		summarizeBy: none
+		sourceColumn: month_num
+
+		annotation SummarizationSetBy = Automatic
+
+	column year_month
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 11f28b39-37dc-4092-ac5b-280a303d546a
+		summarizeBy: none
+		sourceColumn: year_month
+
+		annotation SummarizationSetBy = Automatic
+
+	column iso_year_week
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 97efc801-8ba7-4c75-a647-034abd620c27
+		summarizeBy: none
+		sourceColumn: iso_year_week
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_date = m
+		mode: dual
+		source =
+				let
+				    Source = PostgreSQL.Database("aws-1-eu-central-1.pooler.supabase.com:5432", "postgres"),
+				    marts_dim_date = Source{[Schema="marts",Item="dim_date"]}[Data]
+				in
+				    marts_dim_date
+
+	changedProperty = Name
+
+	annotation PBI_ResultType = Table
+

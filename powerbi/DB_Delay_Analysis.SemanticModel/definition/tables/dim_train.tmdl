@@ -1,0 +1,34 @@
+table dim_train
+	lineageTag: bc99d2cd-e48e-40c4-8d95-305e74855691
+
+	column train_category
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: ed46469a-2a54-4cc0-b556-452660fe0735
+		summarizeBy: none
+		sourceColumn: train_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column train_group
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: f6b599e0-0f47-4c1b-8eda-1eaae4b10128
+		summarizeBy: none
+		sourceColumn: train_group
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_train = m
+		mode: dual
+		source =
+				let
+				    Source = PostgreSQL.Database("aws-1-eu-central-1.pooler.supabase.com:5432", "postgres"),
+				    marts_dim_train = Source{[Schema="marts",Item="dim_train"]}[Data]
+				in
+				    marts_dim_train
+
+	changedProperty = Name
+
+	annotation PBI_ResultType = Table
+

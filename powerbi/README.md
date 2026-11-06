@@ -126,7 +126,9 @@ date-level comparison. It shows blank until 7 days of history exist.
 
 ## 5. Pages
 
-Theme tip: View → Themes → pick one, then use red for "late", green for "on time".
+**Follow [PAGES_GUIDE.md](PAGES_GUIDE.md)** for the step-by-step build: theme import
+(`db_delay_theme.json`), helper measures, and every visual with exact fields, colors, filters and
+position/size on a 1280 × 720 canvas. The tables below are only the short summary.
 
 ### Page 1 — Network now
 | Visual | Fields |

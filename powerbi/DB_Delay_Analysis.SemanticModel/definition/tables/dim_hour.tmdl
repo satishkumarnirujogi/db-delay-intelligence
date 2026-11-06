@@ -1,0 +1,44 @@
+table dim_hour
+	lineageTag: e251c86f-b21b-4579-a0e1-9edbaca76b0e
+
+	column service_hour
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: ff3f7aa7-335d-4147-ae79-5a17a59c6971
+		summarizeBy: none
+		sourceColumn: service_hour
+
+		annotation SummarizationSetBy = Automatic
+
+	column hour_label
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 22d5f74b-4bce-48a3-92e2-2098c9aca4f7
+		summarizeBy: none
+		sourceColumn: hour_label
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_part
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: f17170e5-0a3b-42ed-aab0-dc61f75fedf6
+		summarizeBy: none
+		sourceColumn: day_part
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_hour = m
+		mode: dual
+		source =
+				let
+				    Source = PostgreSQL.Database("aws-1-eu-central-1.pooler.supabase.com:5432", "postgres"),
+				    marts_dim_hour = Source{[Schema="marts",Item="dim_hour"]}[Data]
+				in
+				    marts_dim_hour
+
+	changedProperty = Name
+
+	annotation PBI_ResultType = Table
+
