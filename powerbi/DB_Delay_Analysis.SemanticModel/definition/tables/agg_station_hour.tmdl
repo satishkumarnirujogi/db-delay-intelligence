@@ -1,0 +1,118 @@
+table agg_station_hour
+	lineageTag: 132a95c2-382c-462e-b6dc-0abe812c3676
+
+	column service_date
+		dataType: dateTime
+		formatString: Long Date
+		sourceProviderType: date
+		lineageTag: dc3b1046-a442-4287-b328-9aed80095fea
+		summarizeBy: none
+		sourceColumn: service_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column service_hour
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: a34e78c4-9c84-4212-867e-69ad97f86b80
+		summarizeBy: none
+		sourceColumn: service_hour
+
+		annotation SummarizationSetBy = Automatic
+
+	column eva
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: bb005f7b-fe94-46a5-9fb6-ec0a6f2d99ea
+		summarizeBy: none
+		sourceColumn: eva
+
+		annotation SummarizationSetBy = Automatic
+
+	column train_category
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 43c9f053-c178-4b44-bb27-30b12e44f814
+		summarizeBy: none
+		sourceColumn: train_category
+
+		annotation SummarizationSetBy = Automatic
+
+	column departures
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 04da180c-fb54-4648-88c4-dc48e3f68b82
+		summarizeBy: sum
+		sourceColumn: departures
+
+		annotation SummarizationSetBy = Automatic
+
+	column departures_not_cancelled
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 5986e600-9e4f-4130-b784-a28a6ea55a01
+		summarizeBy: sum
+		sourceColumn: departures_not_cancelled
+
+		annotation SummarizationSetBy = Automatic
+
+	column punctual_departures
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 85227b38-a522-4325-82f5-9fc80c6cae9d
+		summarizeBy: sum
+		sourceColumn: punctual_departures
+
+		annotation SummarizationSetBy = Automatic
+
+	column cancellations
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: caf8bf71-1fad-4b3c-90c5-e7f8b2a7bc19
+		summarizeBy: sum
+		sourceColumn: cancellations
+
+		annotation SummarizationSetBy = Automatic
+
+	column platform_changes
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 8b668c82-f102-4906-ada2-79ae0d326778
+		summarizeBy: sum
+		sourceColumn: platform_changes
+
+		annotation SummarizationSetBy = Automatic
+
+	column avg_dep_delay_min
+		dataType: double
+		sourceProviderType: decimal
+		lineageTag: 2700442d-913b-480d-9f0d-9be43b0655a7
+		summarizeBy: sum
+		sourceColumn: avg_dep_delay_min
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition agg_station_hour = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("aws-1-eu-central-1.pooler.supabase.com:5432", "postgres"),
+				    marts_agg_station_hour = Source{[Schema="marts",Item="agg_station_hour"]}[Data]
+				in
+				    marts_agg_station_hour
+
+	changedProperty = Name
+
+	annotation PBI_ResultType = Table
+

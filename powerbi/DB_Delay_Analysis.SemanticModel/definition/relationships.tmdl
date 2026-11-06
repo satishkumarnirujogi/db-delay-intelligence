@@ -1,0 +1,28 @@
+relationship cbc77098-cad1-af08-6de7-bf77ed8d1a9d
+	fromColumn: v_today_stop_event.eva
+	toColumn: dim_station.eva
+
+relationship 86617721-5a09-46d0-17d8-90dabac7ce27
+	fromColumn: v_today_stop_event.train_category
+	toColumn: dim_train.train_category
+
+relationship 5e32be16-51ae-04fc-e30e-334a4a34ed3d
+	fromColumn: v_today_stop_event.service_hour
+	toColumn: dim_hour.service_hour
+
+relationship 4bcadfc3-1b73-e956-3e1b-ffdd5e7f4a89
+	fromColumn: agg_station_hour.eva
+	toColumn: dim_station.eva
+
+relationship f641c754-2b98-6046-7776-c594d373e1cb
+	fromColumn: agg_station_hour.train_category
+	toColumn: dim_train.train_category
+
+relationship 875ca361-f1da-824c-0f16-8f60ab0c57a4
+	fromColumn: agg_station_hour.service_hour
+	toColumn: dim_hour.service_hour
+
+relationship 54e20c6c-3598-ad91-a00b-f0d6e891237d
+	fromColumn: agg_station_hour.service_date
+	toColumn: dim_date.date_day
+

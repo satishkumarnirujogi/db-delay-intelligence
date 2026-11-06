@@ -1,0 +1,98 @@
+table v_pipeline_status
+	lineageTag: 24286b6e-5364-4e6f-bf5c-78eec72f50f4
+
+	column minutes_since_changes
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 226b090d-d030-450b-93a6-ad4587f9228e
+		summarizeBy: sum
+		sourceColumn: minutes_since_changes
+
+		annotation SummarizationSetBy = Automatic
+
+	column minutes_since_plan
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: c58b79b5-db12-47d4-bff5-6fae52e52a6c
+		summarizeBy: sum
+		sourceColumn: minutes_since_plan
+
+		annotation SummarizationSetBy = Automatic
+
+	column minutes_since_score
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 917aade6-d045-45ff-81aa-52e20a4caf98
+		summarizeBy: sum
+		sourceColumn: minutes_since_score
+
+		annotation SummarizationSetBy = Automatic
+
+	column failed_runs_24h
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: b69b73e2-da52-49d6-b2d0-8d68f33a9bb4
+		summarizeBy: sum
+		sourceColumn: failed_runs_24h
+
+		annotation SummarizationSetBy = Automatic
+
+	column db_mb
+		dataType: double
+		sourceProviderType: decimal
+		lineageTag: 581b1b0c-dfdd-4eb8-8548-5ba3b216030c
+		summarizeBy: sum
+		sourceColumn: db_mb
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column storage_mb
+		dataType: double
+		sourceProviderType: decimal
+		lineageTag: 9e7cac3a-05b5-4088-bac3-7dde9e663d85
+		summarizeBy: sum
+		sourceColumn: storage_mb
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column db_limit_mb
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 8e4c642d-91e2-40ec-829c-917a638bf07b
+		summarizeBy: sum
+		sourceColumn: db_limit_mb
+
+		annotation SummarizationSetBy = Automatic
+
+	column storage_limit_mb
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: d3419d88-c829-4896-ba53-f93705bb6cf0
+		summarizeBy: sum
+		sourceColumn: storage_limit_mb
+
+		annotation SummarizationSetBy = Automatic
+
+	partition v_pipeline_status = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database("aws-1-eu-central-1.pooler.supabase.com:5432", "postgres"),
+				    marts_v_pipeline_status = Source{[Schema="marts",Item="v_pipeline_status"]}[Data]
+				in
+				    marts_v_pipeline_status
+
+	changedProperty = Name
+
+	annotation PBI_ResultType = Table
+

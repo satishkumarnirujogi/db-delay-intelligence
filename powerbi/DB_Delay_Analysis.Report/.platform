@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "DB_Delay_Analysis"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "bb850a5d-8d7a-4af0-9143-63b212b51bbb"
+  }
+}

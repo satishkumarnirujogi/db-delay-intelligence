@@ -1,0 +1,69 @@
+table dim_station
+	lineageTag: 26215766-0e93-4c85-9a99-b1e06fe0c5ce
+
+	column eva
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 56a5f399-253f-44bb-a516-2ebae8c09dc8
+		summarizeBy: none
+		sourceColumn: eva
+
+		annotation SummarizationSetBy = Automatic
+
+	column station_name
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: bd91cb4c-3e06-4dfd-a4bb-c02252f12376
+		summarizeBy: none
+		sourceColumn: station_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column lat
+		dataType: double
+		sourceProviderType: decimal
+		lineageTag: 134f78d4-5657-4662-8785-dd71ffc48a4e
+		dataCategory: Latitude
+		summarizeBy: sum
+		sourceColumn: lat
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column lon
+		dataType: double
+		sourceProviderType: decimal
+		lineageTag: 8420879c-0125-45c0-86eb-6d4d9eab1a54
+		dataCategory: Longitude
+		summarizeBy: sum
+		sourceColumn: lon
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column is_berlin
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		sourceProviderType: bit
+		lineageTag: f33bb58a-54be-4ce9-9f1b-e2c008fadcde
+		summarizeBy: none
+		sourceColumn: is_berlin
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_station = m
+		mode: dual
+		source =
+				let
+				    Source = PostgreSQL.Database("aws-1-eu-central-1.pooler.supabase.com:5432", "postgres"),
+				    marts_dim_station = Source{[Schema="marts",Item="dim_station"]}[Data]
+				in
+				    marts_dim_station
+
+	changedProperty = Name
+
+	annotation PBI_ResultType = Table
+

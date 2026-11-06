@@ -1,0 +1,154 @@
+table _Measures
+	lineageTag: 75db3919-488f-4481-8122-fbe04e0e5f0a
+
+	measure Departures = SUM ( v_today_stop_event[f_departed] )
+		formatString: 0
+		lineageTag: ceee1d67-de74-4b97-a762-79f5e0c88421
+
+	measure 'Departures Not Cancelled' = SUM ( v_today_stop_event[f_departed_not_cancelled] )
+		formatString: 0
+		lineageTag: c44e34b5-a1ef-4239-b696-18ca5682abe0
+
+	measure 'On-time Departures' = SUM ( v_today_stop_event[f_on_time] )
+		formatString: 0
+		lineageTag: 37cb9ddb-d4ae-4655-8e69-58d6342e282b
+
+	measure 'Punctuality %' = DIVIDE ( [On-time Departures], [Departures Not Cancelled] )
+		formatString: 0.0%
+		lineageTag: bf724bcd-7c96-4b37-a36b-ec67318bfb35
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Delay (min)' = DIVIDE ( SUM ( v_today_stop_event[f_delay_value] ), SUM ( v_today_stop_event[f_delay_count] ) )
+		formatString: 0.0
+		lineageTag: fce2f2db-4f3e-4be8-a67c-5a3ff271fbf9
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure Cancellations = SUM ( v_today_stop_event[f_cancelled] )
+		formatString: 0
+		lineageTag: c40951de-a418-476f-a957-a9ae8b615009
+
+	measure 'Platform Changes' = SUM ( v_today_stop_event[f_platform_changed] )
+		formatString: 0
+		lineageTag: c6144686-e570-4412-8239-70ac4161eb89
+
+	measure 'Live Data Coverage %' = DIVIDE ( SUM ( v_today_stop_event[f_live] ), SUM ( v_today_stop_event[f_departed] ) )
+		formatString: 0.0%
+		lineageTag: 095cbd3b-13b6-4056-9dcf-60950cfc0a29
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'History Punctuality % (same weekday last week)' =
+			
+			VAR _today = TODAY ()
+			RETURN
+			    CALCULATE ( [History Punctuality %], dim_date[date_day] = _today - 7 )
+		lineageTag: 1eee9e95-6d89-49a7-a45e-7430b1a629ab
+
+	measure 'Minutes Since Last Load' = MAX ( v_pipeline_status[minutes_since_changes] )
+		formatString: 0
+		lineageTag: d780ac19-03d1-4489-9e30-d2ffdc789230
+
+	measure 'Pipeline Status' = ```
+			
+			IF ( [Minutes Since Last Load] <= 20 && MAX ( v_pipeline_status[failed_runs_24h] ) = 0, 
+			     "Healthy", IF ( [Minutes Since Last Load] <= 60, "Degraded", "Down" ) )
+			```
+		lineageTag: 20f1ec83-81d5-4a08-8d47-c8ca54812883
+
+	measure 'Failed Runs (24h)' = MAX ( v_pipeline_status[failed_runs_24h] )
+		formatString: 0
+		lineageTag: d3103bfc-7574-477a-9d0d-d1d43d43d43d
+
+	measure 'DB Used %' = DIVIDE ( MAX ( v_pipeline_status[db_mb] ), MAX ( v_pipeline_status[db_limit_mb] ) )
+		formatString: 0.0%
+		lineageTag: 34c9279e-8d2e-492d-9933-bfdac97b1f02
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Storage Used %' = DIVIDE ( MAX ( v_pipeline_status[storage_mb] ), MAX ( v_pipeline_status[storage_limit_mb] ) )
+		formatString: 0.0%
+		lineageTag: 99786465-d95b-41aa-a0ca-3c2af8c6f591
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Last Load Label' = "Last load " & [Minutes Since Last Load] & " min ago"
+		lineageTag: e32e93ba-c792-442e-bf8f-5d6cb50cbe3e
+
+	measure 'Pipeline Status Color' = SWITCH ( [Pipeline Status], "Healthy", "#1E8E3E", "Degraded", "#F9AB00", "#D93025" )
+		lineageTag: 165c1157-1954-49b1-a871-381eb3701dff
+
+	measure 'Delay Band Color' =
+			SWITCH (
+			    SELECTEDVALUE ( v_today_stop_event[delay_band] ),
+			    "on time (<6)", "#1E8E3E",
+			    "6-15 min",     "#F9AB00",
+			    "16-30 min",    "#E8710A",
+			    "30+ min",      "#D93025",
+			    "cancelled",    "#6B7280"
+			)
+		lineageTag: f2d9dd37-4088-43ed-a0e9-3e9416cf116a
+
+	measure 'Run Status Color' = SWITCH ( SELECTEDVALUE ( v_pipeline_runs[status] ), "success", "#1E8E3E", "failed", "#D93025", "#F9AB00" )
+		lineageTag: c503c58a-0ec4-4425-a3a8-6a63f4641f90
+
+	measure 'Usage Warning Line' = 0.8
+		formatString: 0%
+		lineageTag: 4c139e15-1d34-4550-a78f-c87e0998ac92
+
+	measure 'Departures Today' = COUNTROWS ( v_today_stop_event )
+		formatString: 0
+		lineageTag: 48c5b753-7555-4a3a-acb6-dd9424b3aec3
+
+	measure 'Punctuality Color' =
+			VAR p = [Punctuality %]
+			RETURN SWITCH ( TRUE (), ISBLANK ( p ), "#6B7280", p >= 0.8, "#1E8E3E", p >= 0.65, "#F9AB00", "#D93025" )
+		lineageTag: 6c1f3b2a-9d4e-4f7a-8b21-3e5a7c9d0f12
+
+	measure 'Delay Min Color' =
+			VAR d = SELECTEDVALUE ( v_today_stop_event[dep_delay_min] )
+			RETURN SWITCH ( TRUE (), ISBLANK ( d ), BLANK (), d < 6, "#1E8E3E", d < 16, "#F9AB00", "#D93025" )
+		lineageTag: e91a6ba5-2b71-4495-bcfc-571b35c0b5ff
+
+	measure 'Minutes Color' =
+			VAR m = [Minutes Since Last Load]
+			RETURN SWITCH ( TRUE (), ISBLANK ( m ), "#6B7280", m <= 20, "#1E8E3E", m <= 60, "#F9AB00", "#D93025" )
+		lineageTag: 0b7d2c41-5e8a-4f3b-9c6d-1a2b3c4d5e01
+
+	measure 'Failed Runs Color' = IF ( [Failed Runs (24h)] >= 1, "#D93025", "#1E8E3E" )
+		lineageTag: 0b7d2c41-5e8a-4f3b-9c6d-1a2b3c4d5e02
+
+	measure 'DB Used Color' =
+			VAR u = [DB Used %]
+			RETURN SWITCH ( TRUE (), u >= 0.8, "#D93025", u >= 0.6, "#F9AB00", "#1E8E3E" )
+		lineageTag: 0b7d2c41-5e8a-4f3b-9c6d-1a2b3c4d5e03
+
+	measure 'Storage Used Color' =
+			VAR u = [Storage Used %]
+			RETURN SWITCH ( TRUE (), u >= 0.8, "#D93025", u >= 0.6, "#F9AB00", "#1E8E3E" )
+		lineageTag: 0b7d2c41-5e8a-4f3b-9c6d-1a2b3c4d5e04
+
+	measure 'Run In Last 24h' = IF ( MAX ( v_pipeline_runs[started_local] ) >= NOW () - 1, 1 )
+		formatString: 0
+		lineageTag: 0b7d2c41-5e8a-4f3b-9c6d-1a2b3c4d5e05
+
+	column Column1
+		dataType: string
+		lineageTag: 1dabbc35-30d1-4ba2-ab41-b0cbb45d87c0
+		summarizeBy: none
+		sourceColumn: Column1
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_ResultType = Table
+

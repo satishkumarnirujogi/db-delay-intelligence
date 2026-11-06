@@ -1,0 +1,92 @@
+table v_pipeline_runs
+	lineageTag: d175c0df-e49c-469b-875b-8315f9ec0574
+
+	column run_id
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: fafdbdac-6610-4a94-a93a-d3c2a188f654
+		summarizeBy: none
+		sourceColumn: run_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column job
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 49ab4c3c-ba80-4345-a2d9-f8a493072dc6
+		summarizeBy: none
+		sourceColumn: job
+
+		annotation SummarizationSetBy = Automatic
+
+	column status
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 8a658734-3933-4a4f-8f5b-10454a448cfa
+		summarizeBy: none
+		sourceColumn: status
+
+		annotation SummarizationSetBy = Automatic
+
+	column started_local
+		dataType: dateTime
+		formatString: dd.MM HH:mm
+		sourceProviderType: datetime2
+		lineageTag: 7f2e05aa-1911-42f7-a95b-497e68c41050
+		summarizeBy: none
+		sourceColumn: started_local
+
+		annotation SummarizationSetBy = Automatic
+
+	column duration_s
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 31b22bf8-db5a-4fcc-b3f9-95d1f84c95c2
+		summarizeBy: none
+		sourceColumn: duration_s
+
+		annotation SummarizationSetBy = Automatic
+
+	column api_calls
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 681ff51d-de70-4101-bbf9-6bf350e95804
+		summarizeBy: none
+		sourceColumn: api_calls
+
+		annotation SummarizationSetBy = Automatic
+
+	column rows_inserted
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: e2db1134-ba32-4ea6-8859-f788ff0efe24
+		summarizeBy: none
+		sourceColumn: rows_inserted
+
+		annotation SummarizationSetBy = Automatic
+
+	column error
+		dataType: string
+		sourceProviderType: nvarchar(max)
+		lineageTag: 909c1522-d5a1-4d8c-b9ce-72f53291722f
+		summarizeBy: none
+		sourceColumn: error
+
+		annotation SummarizationSetBy = Automatic
+
+	partition v_pipeline_runs = m
+		mode: directQuery
+		source =
+				let
+				    Source = PostgreSQL.Database("aws-1-eu-central-1.pooler.supabase.com:5432", "postgres"),
+				    marts_v_pipeline_runs = Source{[Schema="marts",Item="v_pipeline_runs"]}[Data]
+				in
+				    marts_v_pipeline_runs
+
+	changedProperty = Name
+
+	annotation PBI_ResultType = Table
+
