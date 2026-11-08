@@ -1,4 +1,4 @@
-{{ config(materialized='view', tags=['live']) }}
+{{ config(materialized='view', tags=['daily']) }}
 
 -- Last 7 days of pipeline jobs for the Pipeline health page (DirectQuery).
 select

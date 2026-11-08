@@ -12,11 +12,11 @@ models:
     staging:
       +materialized: view
       +schema: intermediate
-      +tags: ["live"]
+      +tags: ["daily"]
     intermediate:
       +materialized: view
       +schema: intermediate
-      +tags: ["live"]
+      +tags: ["daily"]
     marts:
       +materialized: table
       +schema: marts

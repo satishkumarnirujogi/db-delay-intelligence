@@ -197,3 +197,6 @@ exposures:
       - ref('dim_hour')
       - ref('v_pipeline_runs')
       - ref('v_pipeline_status')
+      - ref('v_next_2h_predictions')
+      - ref('v_alerts')
+      - ref('ml_prediction_eval')

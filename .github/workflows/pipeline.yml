@@ -45,7 +45,15 @@ jobs:
           dbt source freshness --no-version-check
           dbt build --selector live --no-version-check
 
-      - name: Log ML features (self-gated, every ~30 min)
+      - name: Restore model cache (re-download only when a new model is promoted)
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/db_delay_model
+          key: model-${{ github.run_id }}
+          restore-keys: model-
+
+      - name: Label, log features, predict (self-gated, every ~30 min)
         run: python -m ml.score
 
-      # ml.anomalies is added once 3 weeks of history exist
+      - name: Anomaly alerts (silent until 3 weeks of history exist)
+        run: python -m ml.anomalies

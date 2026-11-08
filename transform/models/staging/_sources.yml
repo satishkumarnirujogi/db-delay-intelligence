@@ -26,3 +26,11 @@ sources:
     tables:
       - name: ingestion_runs
       - name: platform_usage
+
+  - name: ml
+    schema: ml
+    tables:
+      - name: feature_log
+      - name: predictions
+      - name: model_runs
+      - name: alerts

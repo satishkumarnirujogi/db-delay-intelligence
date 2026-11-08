@@ -25,6 +25,16 @@ def upload_raw(path: str, content: bytes, bucket: str = "bronze") -> None:
     upload(path, gzip.compress(content), "application/gzip", bucket)
 
 
+def download(path: str, bucket: str = "bronze") -> bytes | None:
+    """Returns the file, or None if it does not exist."""
+    base, headers = _base_and_headers()
+    resp = requests.get(f"{base}/object/{bucket}/{path}", headers=headers, timeout=60)
+    if resp.status_code in (400, 404):  # Supabase answers 400 "Object not found"
+        return None
+    resp.raise_for_status()
+    return resp.content
+
+
 def delete(paths: list[str], bucket: str = "bronze") -> int:
     base, headers = _base_and_headers()
     for i in range(0, len(paths), 500):

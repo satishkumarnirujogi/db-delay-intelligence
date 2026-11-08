@@ -1,4 +1,4 @@
-{{ config(materialized='view', tags=['live']) }}
+{{ config(materialized='view', tags=['daily']) }}
 
 -- One row, computed at query time, so DirectQuery cards are always current
 -- (no time-zone maths in DAX).

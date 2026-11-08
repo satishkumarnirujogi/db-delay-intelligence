@@ -1,11 +1,11 @@
 selectors:
   - name: live
-    description: Every 10 min - staging/intermediate views and the incremental fact.
+    description: "Every 10 min - only the incremental fact table. Views are rebuilt daily: re-creating them every run made live readers like Power BI briefly fail."
     definition:
       method: tag
       value: live
   - name: daily
-    description: Once a day - aggregates and dimensions.
+    description: "Once a day - views, aggregates and dimensions."
     definition:
       method: tag
       value: daily

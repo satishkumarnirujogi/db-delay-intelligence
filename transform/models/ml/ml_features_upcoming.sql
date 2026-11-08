@@ -1,4 +1,4 @@
-{{ config(materialized='view', schema='ml', tags=['live']) }}
+{{ config(materialized='view', schema='ml', tags=['daily']) }}
 
 -- Features for departures in the next 2 hours, computed from what is known right now.
 -- ml/score.py logs each stop once (25-65 min before departure) into ml.feature_log.

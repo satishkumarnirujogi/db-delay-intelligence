@@ -1,4 +1,4 @@
-{{ config(materialized='view', tags=['live']) }}
+{{ config(materialized='view', tags=['daily']) }}
 
 -- Small, live slice for Power BI DirectQuery: today's stops in Berlin time.
 -- *_local columns are Berlin wall-clock times (timestamp without zone) for display.

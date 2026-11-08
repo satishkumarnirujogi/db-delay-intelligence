@@ -6,3 +6,65 @@ models:
     columns:
       - name: stop_id
         data_tests: [unique, not_null]
+
+  - name: ml_prediction_eval
+    description: >
+      Daily model quality: prediction made at logging time vs actual delay, next to the
+      persistence baseline ("stays as late as now"). Power BI "Model quality" page.
+    config:
+      contract: {enforced: true}
+    columns:
+      - {name: service_date, data_type: date}
+      - {name: model_version, data_type: text}
+      - {name: departures, data_type: integer}
+      - {name: mae_model, data_type: "numeric(8,2)"}
+      - {name: mae_persistence, data_type: "numeric(8,2)"}
+      - {name: share_late_actual, data_type: "numeric(5,3)"}
+      - {name: avg_p_late, data_type: "numeric(5,3)"}
+      - {name: flagged_and_late, data_type: integer}
+      - {name: flagged, data_type: integer}
+      - {name: late, data_type: integer}
+
+  - name: v_next_2h_predictions
+    description: Upcoming departures (next 2 h) with the latest prediction. Power BI "Next 2 hours".
+    config:
+      contract: {enforced: true}
+    columns:
+      - name: stop_id
+        data_type: text
+        data_tests: [unique]
+      - {name: eva, data_type: integer}
+      - {name: station_name, data_type: text}
+      - {name: train_category, data_type: text}
+      - {name: train_number, data_type: text}
+      - {name: line, data_type: text}
+      - {name: planned_platform, data_type: text}
+      - {name: planned_dep_local, data_type: timestamp without time zone}
+      - {name: minutes_to_departure, data_type: integer}
+      - {name: current_delay_min, data_type: integer}
+      - {name: pred_delay_min, data_type: "numeric(6,1)"}
+      - {name: p_late, data_type: "numeric(4,3)"}
+      - name: risk_band
+        data_type: text
+        data_tests:
+          - accepted_values: {arguments: {values: ['High', 'Medium', 'Low']}}
+      - {name: model_version, data_type: text}
+      - {name: scored_local, data_type: timestamp without time zone}
+
+  - name: v_alerts
+    description: Last 7 days of anomaly alerts with station names. Power BI "Alerts".
+    config:
+      contract: {enforced: true}
+    columns:
+      - {name: eva, data_type: integer}
+      - {name: station_name, data_type: text}
+      - {name: service_date, data_type: date}
+      - {name: service_hour, data_type: integer}
+      - {name: metric, data_type: text}
+      - {name: metric_label, data_type: text}
+      - {name: current_value, data_type: "numeric(10,2)"}
+      - {name: baseline_median, data_type: "numeric(10,2)"}
+      - {name: robust_z, data_type: "numeric(6,1)"}
+      - {name: departures, data_type: integer}
+      - {name: severity, data_type: text}
+      - {name: detected_local, data_type: timestamp without time zone}

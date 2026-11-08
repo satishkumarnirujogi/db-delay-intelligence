@@ -9,7 +9,7 @@
 | 4 | `pipeline.yml` + cron-job.org trigger | ✅ running every 10 min |
 | 5 | dbt: staging → intermediate → marts, 2 unit tests, 22 data tests, contracts, exposure; `daily.yml` | ✅ green locally (39/39) |
 | 6a | Feature log: `ml_features_upcoming` view + `ml.feature_log` + `ml/score.py` | ✅ logging since 2026-11-05 |
-| 6b | Train (LightGBM vs baseline), predictions, anomalies, `train.yml` | ⏳ from ~2026-11-22, once 2–3 weeks of logs exist |
+| 6b | `ml/train.py` (weekly, `train.yml`), predictions in `ml/score.py`, `ml/anomalies.py`, `ml_prediction_eval`, `v_next_2h_predictions`, `v_alerts` | ✅ first model promoted 2026-11-08 (see below); anomalies silent until ~2026-11-29 |
 | 7 | `ml/housekeeping.py` (Parquet export, retention, raw cleanup, `ops.platform_usage`) in `daily.yml`; `ci.yml` | ✅ housekeeping verified live; CI verified on first GitHub run |
 | 8 | Power BI: `v_today_stop_event` local-time + `is_departed` columns, `v_pipeline_runs`, `v_pipeline_status`; build guide `powerbi/README.md` (pages 1, 2, 7) | 🟡 data side done; dashboard to build in Desktop |
 | 9 | README polish | ⏳ |
@@ -48,3 +48,27 @@
 
 `changes`: 15 calls, ~19 s, 6,281 rows (2nd run: 43 new rows, 0 duplicates) ·
 `hourly`: 30 calls, ~36 s, 1,017 plan stops + 135 weather rows · DB size 13 MB.
+
+## AI layer (2026-11-08)
+
+- **Labels live in `ml.feature_log`** (`actual_delay_min`, filled 30 min after departure) together with
+  the prediction made at logging time, so training, evaluation and Parquet history use one table and
+  survive the 30-day trim of `fact_stop_event`.
+- **First model `20261108-1811`** (4 days of data; test = last quarter, 3,926 departures, never shuffled):
+
+  | | MAE (min) | AUC (6+ min late) |
+  |---|---|---|
+  | Baseline: median per station × hour × category | 5.08 | 0.68 |
+  | Persistence: "stays as late as now" | 2.92 | – |
+  | **LightGBM** | **2.88** | **0.83** (precision 0.70, recall 0.48 at p ≥ 0.5) |
+
+  Honest read: most of the signal is the current delay; the model's main gain over persistence is the
+  calibrated *probability* of being late. Promotion rule: beat the baseline MAE with ≥ 500 test rows.
+- Anomalies: robust z-score vs the same station/weekday/hour 1–4 weeks back; needs 3 of those 4 days,
+  so the first real alerts can appear around 2026-11-26/29. Logic tested on synthetic history.
+- **Views are rebuilt daily, not every 10 min.** Re-creating views every run made concurrent readers
+  (Power BI DirectQuery, `score.py`) briefly fail with "relation does not exist". The 10-min run now only
+  updates `fact_stop_event` (updated in place). After changing a view's SQL, run `daily.yml` by hand
+  (Actions → daily → Run workflow) or `dbt build` locally.
+- Model files (~1 MB) are cached on the GitHub runner (`actions/cache`); only `meta.json` is downloaded
+  per run, saving ~1.4 GB/month of the 5 GB Supabase egress.
