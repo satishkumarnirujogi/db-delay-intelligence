@@ -14,10 +14,8 @@ with joined as (
         coalesce(c.is_cancelled, false)         as is_cancelled,
         coalesce(c.changed_platform is not null and c.changed_platform <> p.planned_platform, false)
                                                 as platform_changed,
-        round(extract(epoch from (coalesce(c.changed_dep, p.planned_dep) - p.planned_dep)) / 60)::int
-                                                as dep_delay_min,
-        round(extract(epoch from (coalesce(c.changed_arr, p.planned_arr) - p.planned_arr)) / 60)::int
-                                                as arr_delay_min,
+        {{ plausible_delay("coalesce(c.changed_dep, p.planned_dep) - p.planned_dep") }} as dep_delay_min,
+        {{ plausible_delay("coalesce(c.changed_arr, p.planned_arr) - p.planned_arr") }} as arr_delay_min,
         greatest(p.loaded_at, coalesce(c.loaded_at, p.loaded_at)) as loaded_at
     from {{ ref('stg_db__plan_stops') }} p
     left join {{ ref('int_stop_latest_change') }} c using (stop_id)
